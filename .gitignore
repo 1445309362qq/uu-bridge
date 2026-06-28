@@ -1,0 +1,10 @@
+node_modules/
+.env
+credentials.json
+sessions.json
+/tmp/
+*.mp3
+*.m4a
+*.wav
+*.tgz
+/dist/

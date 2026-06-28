@@ -1,0 +1,25 @@
+{
+  "name": "weixin-claude-bridge",
+  "version": "1.0.0",
+  "description": "基于微信 iLink 协议的 Claude 微信接入桥 — 无需 OpenClaw，直接对接微信 ClawBot",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "login": "tsx src/index.ts --login",
+    "uu": "tsx src/index.ts --char uu"
+  },
+  "dependencies": {
+    "duckduckgo-images-api": "^1.0.5",
+    "edge-tts": "^1.0.1",
+    "pm2": "^7.0.1",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3"
+  }
+}
