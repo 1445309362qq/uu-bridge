@@ -139,9 +139,13 @@ function buildMessages(
   return [...history, { role: "user" as const, content: userContent }];
 }
 
-/** 正常有礼貌的女生，基本都会回 */
-function shouldReply(_parsed: ParsedMessage): { reply: boolean; reason: string } {
-  return { reply: Math.random() < 0.95, reason: "💬" };
+/** 初期热情伪装，确认后可随意无视 */
+function shouldReply(_parsed: ParsedMessage, familiarity?: number): { reply: boolean; reason: string } {
+  const fam = familiarity ?? 0;
+  if (fam < 15) return { reply: Math.random() < 0.95, reason: "💬" };  // 初期：热情伪装
+  if (fam < 30) return { reply: Math.random() < 0.7, reason: "💬" };   // 试探期：开始忽冷忽热
+  if (fam < 50) return { reply: Math.random() < 0.4, reason: "💬" };   // 面具脱落：爱回不回
+  return { reply: Math.random() < 0.2, reason: "💬" };                   // 掌控期：他求着回
 }
 
 /** 处理单条消息并返回回复 */
@@ -158,14 +162,7 @@ export async function handleMessage(params: {
   const { parsed, sessionStore, claudeConfig, characterConfig, weixinConfig } = params;
   const userId = parsed.fromUserId;
 
-  // 代码级过滤：先判断值不值得回
-  const decision = shouldReply(parsed);
-  if (!decision.reply) {
-    console.log(`🚫 无视 (${decision.reason}): ${parsed.text.slice(0, 40)}`);
-    return; // 什么都不回，让他等着
-  }
-  console.log(`✅ 回复 (${decision.reason}): ${parsed.text.slice(0, 40)}`);
-
+  // 获取或创建 session
   let session = sessionStore.get(userId);
   if (!session) {
     session = sessionStore.create(userId, parsed.contextToken);
@@ -173,7 +170,14 @@ export async function handleMessage(params: {
     session.contextToken = parsed.contextToken;
     session.lastActiveAt = Date.now();
   }
-  sessionStore.set(userId, session);
+
+  // 代码级过滤
+  const decision = shouldReply(parsed, session.familiarity);
+  if (!decision.reply) {
+    console.log(`🚫 无视 (${decision.reason}): ${parsed.text.slice(0, 40)}`);
+    return;
+  }
+  console.log(`✅ 回复 (${decision.reason}): ${parsed.text.slice(0, 40)}`);
 
   const messages = buildMessages(parsed, session.history);
   const trimmedMessages = messages.slice(-40);
