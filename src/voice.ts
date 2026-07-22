@@ -39,8 +39,5 @@ export async function sendVoiceMessage(params: {
 
 /** 语音频率随亲密度动态变化 */
 export function shouldSendVoice(text: string, familiarity: number = 0): boolean {
-  if (text.length < 5) return false;
-  if (text.length > 200) return false;
-  const rate = 0.08 + (familiarity / 100) * 0.42; // 8% → 50%
-  return Math.random() < rate;
+  return false; // 语音功能已关闭
 }
